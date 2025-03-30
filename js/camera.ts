@@ -23,4 +23,12 @@ export class Camera {
 
         return viewMatrix;
     }
+   
+    translate(translationVector: vec3) {
+        glm.mat4.translate(
+            this.viewMatrix,
+            this.viewMatrix,
+            translationVector
+        )
+    }
 }

@@ -1,14 +1,28 @@
-# Lab 0
+# Lab 1a
 
-### Book paragraph
+## Claim
+- T1 implemented
+- T2 implemented
+- T3 implemented
+    - a) implemented
+    - b) implemented
+    - c) implemented
+    - d) implemented
+- T4 implemented (partially)
+    - NOTE: the OBJ parser is fit for only the sampleModels shown. There are multiple other keywords from the obj parser that I did not implement (most obvious example vt, but we have no textures yet, so I left it unimplemented). I don't know to what extent we're supposed to implement the OBJ Parser, therefore I marked it as partially implemenented.
 
-##### Chapter 3.1.1 The Rotating Square, Page 100
+## Tested environments
+Browsers tested on:
+- Chrome `Version 134.0.6998.178 (Official Build) (64-bit)`
+- Firefox `136.0.4 (64-bit)`
+Developed and Tested on a Windows 10 22H2 with WSL2
 
-Consider the two-dimensional point x = cos θ y = sin θ .
-This point lies on a unit circle regardless of the value of θ. The three points (− sin θ , cos θ ), (− cos θ , − sin θ ), and (sin θ , − cos θ ) also lie on the unit circle. These four points are equidistant along the circumference of the circle, as shown in Figure 3.1. Thus, if we connect the points to form a polygon, we will have a square centered at the origin whose sides are of length √2. We can start with θ = 0, which gives us the four vertices (0, 1), (1, 0), (−1, 0) and (0, −1). We can send these vertices to the GPU by first setting up an array...
 
-### Tutorial & Improvement
-The tutorial I personally used to get to the triangle was the following: https://webglfundamentals.org/webgl/lessons/webgl-fundamentals.html
-
-I do not think that there is much to add upon to this tutorial, other than maybe gif images/visualisations about what each part does. Personally I stumbled upon a nice youtube video, at the start of which the whole process was very nicely visually explained (https://youtu.be/y2UsQB3WSvo?si=rZPtzp97Z6DerQ6q&t=219).
-Another point which seemed quite confusing to me is how the whole "transfering data from buffer to shader attribute" works. There is however an article mentioned in the comments about this(https://webglfundamentals.org/webgl/lessons/webgl-how-it-works.html), and I think it is definitely worth a mention in the tutorial itsself.
+## Additional and general remarks
+The tsconfig i compiled the code with is included
+All I did to run the code was:
+`$tsc`
+`$python3 -m http.server`
+#### Notes
+- I scaled the bunny by default by 8, as it is a tiny model. Because of how I implemented the LCS lines, it also scales them too.
+- OBJParser is left as a class, in case I need to extend/add to it.

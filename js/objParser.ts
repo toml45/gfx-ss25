@@ -1,7 +1,10 @@
 import * as glm from './gl-matrix/index.js';
-import {Shape} from './shape.js';
+import {Shape} from './shapes.js';
 
 export class OBJParser{
+    // NOTE: I am not sure how lab1b looks like, but I left OBJParser 
+    // as a class in case more extending was needed
+    
     static parseOBJ(obj: string): Shape{
         let vertexData: number[] = [];
         let normals: number[] = [];
@@ -19,6 +22,7 @@ export class OBJParser{
                     vertexData.push(parseFloat(inputs[3]));
                     break;
                 case "vn":
+                    //currently we do nothing with the normals
                     normals.push(parseFloat(inputs[1]));
                     normals.push(parseFloat(inputs[2]));
                     normals.push(parseFloat(inputs[3]));
