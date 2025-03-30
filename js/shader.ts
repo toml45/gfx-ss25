@@ -1,4 +1,6 @@
 //TODO: look at these 2 fujncs
+import * as glm from "./gl-matrix/index.js";
+
 /**
  * Creates and compiles a shader (vertex or fragment) from source code.
  * 
@@ -53,6 +55,7 @@ export class Shader {
     locUTransform: WebGLUniformLocation = null; // TODO: (understand) location of the model transformation matrix
     locPTransform: WebGLUniformLocation = null; // location of the projection matrix
     locVTransform: WebGLUniformLocation = null; // TODO: (understand) location of view matrix
+    globTransform: WebGLUniformLocation = null;
 
     constructor(name: string) {
         this.name = name;
@@ -93,7 +96,12 @@ export class Shader {
         //uniforms to shader
         this.locUTransform = gl.getUniformLocation(
             this.program,
-            "u_transform"
+            "u_modelView"
+        ); // can be null 
+
+        this.globTransform = gl.getUniformLocation(
+            this.program,
+            "u_globalTransform"
         ); // can be null 
 
         this.locPTransform = gl.getUniformLocation(
@@ -115,7 +123,7 @@ export class Shader {
      * @param {mat4} projectionMatrix - The projection matrix.
      * @param {mat4} viewMatrix - The view matrix.
      */
-    uniformMatrices(gl: WebGL2RenderingContext, projectionMatrix: mat4, viewMatrix: mat4){
+    uniformMatrices(gl: WebGL2RenderingContext, projectionMatrix: mat4, viewMatrix: mat4, globT: mat4){
         gl.uniformMatrix4fv(
             this.locPTransform,
             false,
@@ -126,6 +134,12 @@ export class Shader {
             this.locVTransform,
             false,
             viewMatrix
+        );
+
+        gl.uniformMatrix4fv(
+            this.globTransform,
+            false,
+            globT
         );
     }
 
