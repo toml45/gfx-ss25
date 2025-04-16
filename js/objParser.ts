@@ -10,7 +10,6 @@ export class OBJParser{
         let normals: number[] = [];
         let indices: number[] = [];
         let colors: number[] = [];
-        let boundingBoxTransform: mat4;
 
         const lines = obj.split('\n');
         for(const line of lines){
