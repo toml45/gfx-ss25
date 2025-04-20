@@ -8,7 +8,7 @@ import * as glm from "./gl-matrix/index.js";
  * @param {string} source - The GLSL source code for the shader.
  * @returns {WebGLShader} The compiled shader.
  */
-const createShader = (gl: WebGL2RenderingContext, type:GLenum, source:string) => {
+const createShader = (gl: WebGL2RenderingContext, type: GLenum, source: string) => {
     const shader = gl.createShader(type);
 
     gl.shaderSource(shader, source);
@@ -48,12 +48,14 @@ const createProgram = (gl: WebGL2RenderingContext, vertexShader: WebGLShader, fr
 
 export class Shader {
     name: string = '';
-    program: WebGLProgram = null; 
+    program: WebGLProgram = null;
     locACoord = -1; // loc of vertex coordinates attribute
     locAColor = -1; // location of vertex color attribute
-    locUTransform: WebGLUniformLocation = null; 
-    locPTransform: WebGLUniformLocation = null; 
-    locVTransform: WebGLUniformLocation = null; 
+    locANormal = -1;
+    locLightPos: WebGLUniformLocation = null;
+    locUTransform: WebGLUniformLocation = null;
+    locPTransform: WebGLUniformLocation = null;
+    locVTransform: WebGLUniformLocation = null;
     globTransform: WebGLUniformLocation = null;
 
     constructor(name: string) {
@@ -80,7 +82,7 @@ export class Shader {
         );
 
         this.program = createProgram(gl, vertShader, fragShader);
-        
+
         //attributes to shader
         this.locACoord = gl.getAttribLocation(
             this.program,
@@ -90,6 +92,11 @@ export class Shader {
         this.locAColor = gl.getAttribLocation(
             this.program,
             "a_color"
+        );
+
+        this.locANormal = gl.getAttribLocation(
+            this.program,
+            "a_normal"
         );
 
         //uniforms to shader
@@ -107,6 +114,11 @@ export class Shader {
             this.program,
             "u_view"
         );
+
+        this.locLightPos = gl.getUniformLocation(
+            this.program,
+            "u_lightPos"
+        )
     }
 
 
@@ -117,7 +129,7 @@ export class Shader {
      * @param {mat4} projectionMatrix - The projection matrix.
      * @param {mat4} viewMatrix - The view matrix.
      */
-    uniformMatrices(gl: WebGL2RenderingContext, projectionMatrix: mat4, viewMatrix: mat4){
+    uniformMatrices(gl: WebGL2RenderingContext, projectionMatrix: mat4, viewMatrix: mat4) {
         gl.uniformMatrix4fv(
             this.locPTransform,
             false,
@@ -137,7 +149,7 @@ export class Shader {
      * Activate the shader program
      * @param {WebGL2RenderingContext} gl
     */
-    bind(gl: WebGL2RenderingContext){
+    bind(gl: WebGL2RenderingContext) {
         gl.useProgram(this.program);
     }
 }

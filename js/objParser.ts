@@ -1,24 +1,29 @@
 import * as glm from './gl-matrix/index.js';
-import {Shape} from './shapes.js';
+import { Shape } from './shapes.js';
 
-export class OBJParser{
-    // NOTE: I am not sure how lab1b looks like, but I left OBJParser 
-    // as a class in case more extending was needed
-    
-    static parseOBJ(obj: string): Shape{
+export class OBJParser {
+
+    static parseOBJ(obj: string): Shape {
+
+        let vertexMap: Map<number, vec3[]> = new Map();
+
         let vertexData: number[] = [];
+        let normalData: number[] = [];
+
+        let vertexes: number[] = [];
         let normals: number[] = [];
         let indices: number[] = [];
         let colors: number[] = [];
 
         const lines = obj.split('\n');
-        for(const line of lines){
+        let index = 0;
+        for (const line of lines) {
             const inputs = line.split(' ');
-            switch(inputs[0]){
+            switch (inputs[0]) {
                 case "v":
-                    vertexData.push(parseFloat(inputs[1]));
-                    vertexData.push(parseFloat(inputs[2]));
-                    vertexData.push(parseFloat(inputs[3]));
+                    vertexes.push(parseFloat(inputs[1]));
+                    vertexes.push(parseFloat(inputs[2]));
+                    vertexes.push(parseFloat(inputs[3]));
                     break;
                 case "vn":
                     //currently we do nothing with the normals
@@ -27,13 +32,42 @@ export class OBJParser{
                     normals.push(parseFloat(inputs[3]));
                     break;
                 case "f":
-                    for(let i = 1; i < 4; i++){ //assume we only have 3 vertices
+                    for (let i = 1; i < 4; i++) { //assume we only have 3 vertices
                         const faceData = inputs[i].split('/');
-                        const vertexCoord = parseFloat(faceData[0])-1;
-                        indices.push(vertexCoord);
+                        const vertexCoord = parseFloat(faceData[0]) - 1;
+                        const normalCoord = parseFloat(faceData[2]) - 1;
 
-                        colors.push(1.0);
+                        const normal = glm.vec3.fromValues(
+                            normals[normalCoord * 3],
+                            normals[normalCoord * 3 + 1],
+                            normals[normalCoord * 3 + 2]
+                        );
+
+                        /*
+                        vertexData.push(vertexes[vertexCoord * 3]);
+                        vertexData.push(vertexes[vertexCoord * 3 + 1]);
+                        vertexData.push(vertexes[vertexCoord * 3 + 2]);
+
+                        normalData.push(normals[normalCoord * 3]);
+                        normalData.push(normals[normalCoord * 3 + 1]);
+                        normalData.push(normals[normalCoord * 3 + 2]);
+
+                        indices.push(index);
+                        index++;
+                        */
+
+
+                        indices.push(vertexCoord)
+                        if (!vertexMap.has(vertexCoord)) {
+                            vertexMap.set(vertexCoord, [normal])
+                        } else {
+                            //console.log('dupe found');
+                            const arr = vertexMap.get(vertexCoord);
+                            arr.push(normal);
+                        }
+
                         colors.push(0.0);
+                        colors.push(1.0);
                         colors.push(0.0);
                     }
                     break;
@@ -41,11 +75,32 @@ export class OBJParser{
                     console.log(`UNSUPPORTED: ${line}`)
             }
         }
+        for (let i = 0; i < vertexes.length / 3; i += 1) {
+            const vertex = [
+                vertexes[i],
+                vertexes[i + 1],
+                vertexes[i + 2]
+            ];
+            //console.log(vertex);
+            const normals: vec3[] = vertexMap.get(i);
+            //console.log(vertexes);
+            //console.log(vertexMap);
+            //console.log(normals);
+            const averageNormal = glm.vec3.create();
+            for (const normal of normals) {
+                glm.vec3.add(averageNormal, averageNormal, normal);
+            }
+            glm.vec3.scale(averageNormal, averageNormal, 1 / normals.length);
+            normalData.push(averageNormal[0]);
+            normalData.push(averageNormal[1]);
+            normalData.push(averageNormal[2]);
+        }
         return new Shape(
-            vertexData,
+            vertexes,
             indices,
             colors,
-            glm.mat4.create()
+            glm.mat4.create(),
+            normalData
         );
     }
 

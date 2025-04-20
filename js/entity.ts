@@ -9,9 +9,9 @@ export abstract class Entity {
     positionTranslationMatrix: mat4;
     rotationMatrix: mat4;
     globalTransformMatrix: mat4;
-    vaoIndex: WebGLVertexArrayObject = null; 
+    vaoIndex: WebGLVertexArrayObject = null;
 
-    constructor (){ 
+    constructor() {
     }
 
     /**
@@ -52,7 +52,7 @@ export abstract class Entity {
             gl.STATIC_DRAW
         );
     }
-    
+
     /**
     * @param {WebGL2RenderingContext} gl
     */
@@ -77,7 +77,7 @@ export abstract class Entity {
 
         // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
         gl.vertexAttribPointer(
-            shader.locACoord, 
+            shader.locACoord,
             3,        // 3 components per iteration, vec3
             gl.FLOAT, // the data is 32bit floats
             false,    // don't normalize the data
