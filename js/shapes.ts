@@ -29,17 +29,19 @@ export class CoordinateVisual extends Entity {
         0.0, 0.0, 1.0
     ];
 
+    globalTranslationMatrix: mat4;
     constructor(
         scalingMatrix: mat4 = glm.mat4.create(),
         positionTranslationMatrix: mat4 = glm.mat4.create(),
         rotationMatrix: mat4 = glm.mat4.create(),
-        globalTransformMatrix: mat4 = glm.mat4.create()
+        globalTransformMatrix: mat4 = glm.mat4.create(),
     ) {
         super();
         this.scalingMatrix = scalingMatrix;
         this.positionTranslationMatrix = positionTranslationMatrix;
         this.rotationMatrix = rotationMatrix;
         this.globalTransformMatrix = globalTransformMatrix;
+        this.globalTranslationMatrix = glm.mat4.create()
     }
 
     /**
@@ -71,6 +73,12 @@ export class CoordinateVisual extends Entity {
         glm.mat4.multiply(
             modelMatrix,
             this.globalTransformMatrix,
+            modelMatrix
+        );
+
+        glm.mat4.multiply(
+            modelMatrix,
+            this.globalTranslationMatrix,
             modelMatrix
         );
 
@@ -106,13 +114,15 @@ export class Shape extends Entity {
     normalData: number[];
     boundingBoxTransform: mat4;
     coordSystem: CoordinateVisual;
+    globalTranslationMatrix: mat4;
+    localTranslationMatrix: mat4;
 
     constructor(
         vertexData: number[],
         indices: number[],
         colors: number[],
         boundingBoxTransform: mat4,
-        normalData: number[]
+        normalData: number[],
     ) {
         super();
         this.vertexData = vertexData;
@@ -123,6 +133,8 @@ export class Shape extends Entity {
         this.positionTranslationMatrix = glm.mat4.create();
         this.rotationMatrix = glm.mat4.create();
         this.globalTransformMatrix = glm.mat4.create();
+        this.globalTranslationMatrix = glm.mat4.create();
+        this.localTranslationMatrix = glm.mat4.create();
         this.normalData = normalData;
         this.coordSystem = new CoordinateVisual(
             // set reference to OBJECT matrices so we dont have to copy 
@@ -160,6 +172,11 @@ export class Shape extends Entity {
     */
     update(gl: WebGL2RenderingContext, shader: Shader) {
         const modelMatrix = glm.mat4.create();
+        glm.mat4.multiply(
+            modelMatrix,
+            this.localTranslationMatrix,
+            modelMatrix
+        );
 
         glm.mat4.multiply(
             modelMatrix,
@@ -191,11 +208,27 @@ export class Shape extends Entity {
             modelMatrix
         );
 
+        glm.mat4.multiply(
+            modelMatrix,
+            this.globalTranslationMatrix,
+            modelMatrix
+        );
+
         gl.uniformMatrix4fv(
             shader.locUTransform,
             false,
             modelMatrix
         );
+
+        const modelInverseTranspose: mat3 = glm.mat3.create();
+        glm.mat3.normalFromMat4(modelInverseTranspose, modelMatrix);
+
+        gl.uniformMatrix3fv(
+            shader.locITransform,
+            false,
+            modelInverseTranspose
+        );
+
     }
 
     /**

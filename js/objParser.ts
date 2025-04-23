@@ -43,20 +43,6 @@ export class OBJParser {
                             normals[normalCoord * 3 + 2]
                         );
 
-                        /*
-                        vertexData.push(vertexes[vertexCoord * 3]);
-                        vertexData.push(vertexes[vertexCoord * 3 + 1]);
-                        vertexData.push(vertexes[vertexCoord * 3 + 2]);
-
-                        normalData.push(normals[normalCoord * 3]);
-                        normalData.push(normals[normalCoord * 3 + 1]);
-                        normalData.push(normals[normalCoord * 3 + 2]);
-
-                        indices.push(index);
-                        index++;
-                        */
-
-
                         indices.push(vertexCoord)
                         if (!vertexMap.has(vertexCoord)) {
                             vertexMap.set(vertexCoord, [normal])
@@ -76,11 +62,7 @@ export class OBJParser {
             }
         }
         for (let i = 0; i < vertexes.length / 3; i += 1) {
-            const vertex = [
-                vertexes[i],
-                vertexes[i + 1],
-                vertexes[i + 2]
-            ];
+
             //console.log(vertex);
             const normals: vec3[] = vertexMap.get(i);
             //console.log(vertexes);

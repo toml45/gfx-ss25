@@ -53,7 +53,10 @@ export class Shader {
     locAColor = -1; // location of vertex color attribute
     locANormal = -1;
     locLightPos: WebGLUniformLocation = null;
+    locUShadowMapSampler: WebGLUniformLocation = null;
+    locUShadowMapTransform: WebGLUniformLocation = null;
     locUTransform: WebGLUniformLocation = null;
+    locITransform: WebGLUniformLocation = null;
     locPTransform: WebGLUniformLocation = null;
     locVTransform: WebGLUniformLocation = null;
     globTransform: WebGLUniformLocation = null;
@@ -105,6 +108,11 @@ export class Shader {
             "u_modelView"
         ); // can be null 
 
+        this.locITransform = gl.getUniformLocation(
+            this.program,
+            "u_modelViewInverseTranspose"
+        );
+
         this.locPTransform = gl.getUniformLocation(
             this.program,
             "u_projection"
@@ -119,6 +127,17 @@ export class Shader {
             this.program,
             "u_lightPos"
         )
+
+        this.locUShadowMapSampler = gl.getUniformLocation(
+            this.program,
+            "u_sampler"
+        );
+
+        this.locUShadowMapTransform = gl.getUniformLocation(
+            this.program,
+            "u_shadowMapTransform"
+        );
+
     }
 
 
@@ -141,7 +160,6 @@ export class Shader {
             false,
             viewMatrix
         );
-
     }
 
 
