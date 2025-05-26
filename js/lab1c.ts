@@ -1,8 +1,24 @@
+import { Camera } from "./camera.js";
 import * as glm from "./gl-matrix/index.js";
+import { Shader } from "./shader.js";
+import { CoordinateVisual } from "./shape.js";
 
 const main = async () => {
     const projectionMatrix = glm.mat4.create();
     const viewMatrix = glm.mat4.create();
+    const globalCoords = new CoordinateVisual();
+    const camera = new Camera(
+        glm.vec3.fromValues(5, 5, 8.0),
+        glm.vec3.fromValues(0, 1, 0),
+        glm.vec3.fromValues(0, 0, 0),
+    );
+
+    //scale the visual of the WCS, so it appears bigger (only visual change)
+    glm.mat4.scale(
+        globalCoords.scalingMatrix,
+        globalCoords.scalingMatrix,
+        glm.vec3.fromValues(3.5, 3.5, 3.5)
+    );
 
     const canvas: HTMLCanvasElement | null = document.querySelector("#glcanvas");
 
@@ -26,6 +42,9 @@ const main = async () => {
     const sBase = new Shader("basic"); //TODO: load shader
     await sBase.loadAndCompile(gl);
 
+    globalCoords.initializeBuffersAndVAO(gl, sBase);
+
+    /*
     function generatePlane() {
         return new Shape(
             [
@@ -52,16 +71,18 @@ const main = async () => {
                 0.0, 1.0, 0.0,
             ]
         );
-    }
+    }*/
 
     //NOTE: to emit typescript error about Offscreencanvas
     const cv = gl.canvas as HTMLCanvasElement;
-    glm.mat4.perspective( //TODO: change to orthographic
+    glm.mat4.ortho( //TODO: change to orthographic
         projectionMatrix, // Output
-        (45 * Math.PI) / 180, // Field of view in radians
-        cv.clientWidth / cv.clientHeight, // Aspect ratio
-        0.1, // Near
-        100.0 // Far
+        glm.vec3.fromValues(),//left
+        glm.vec3.fromValues(),//right
+        glm.vec3.fromValues(),//bottom
+        glm.vec3.fromValues(),//top
+        glm.vec3.fromValues(),//near
+        glm.vec3.fromValues(),//far
     );
 
     const draw = (_: any) => {
@@ -73,12 +94,16 @@ const main = async () => {
         //gl.viewport(0, 0, gl.canvas.width, gl.canvas.height); 
 
         sBase.bind(gl);
-        sBase.uniformMatrices(gl, projectionMatrix, viewMatrix);
-
+        sBase.uniformMatrices(gl, projectionMatrix, camera.viewMatrix);
         //TODO: draw objects
+        globalCoords.draw(gl, sBase);
 
 
         window.requestAnimationFrame(draw);
 
     }
+    window.requestAnimationFrame(draw);
 }
+
+
+main();

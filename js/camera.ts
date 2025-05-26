@@ -8,13 +8,13 @@ export class Camera {
         const toTarget = glm.vec3.create();
         glm.vec3.sub(toTarget, target, eye);
         glm.vec3.normalize(toTarget, toTarget);
-
         glm.mat4.lookAt(
             this.viewMatrix,
             eye,
             toTarget,
             up
         );
+
     }
 
     //TODO add transformation methods or perhaps do them immediately?
