@@ -240,7 +240,6 @@ const main = async () => {
             gl.bindFramebuffer(gl.FRAMEBUFFER, depthFrameBuffer);
             gl.viewport(0, 0, 1024, 1024); //TODO: check
             gl.clear(gl.DEPTH_BUFFER_BIT);
-            8
             const lightViewMatrix = glm.mat4.create()
 
             const target = glm.vec3.create();
