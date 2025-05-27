@@ -1,5 +1,6 @@
 import { Camera } from "./camera.js";
 import * as glm from "./gl-matrix/index.js";
+import { Grid } from "./grid.js";
 import { Shader } from "./shader.js";
 import { CoordinateVisual } from "./shape.js";
 
@@ -7,8 +8,9 @@ const main = async () => {
     const projectionMatrix = glm.mat4.create();
     const viewMatrix = glm.mat4.create();
     const globalCoords = new CoordinateVisual();
+    const grid = new Grid();
     const camera = new Camera(
-        glm.vec3.fromValues(5, 5, 8.0),
+        glm.vec3.fromValues(10, 5, 5.0),
         glm.vec3.fromValues(0, 1, 0),
         glm.vec3.fromValues(0, 0, 0),
     );
@@ -43,48 +45,20 @@ const main = async () => {
     await sBase.loadAndCompile(gl);
 
     globalCoords.initializeBuffersAndVAO(gl, sBase);
+    grid.initializeBuffersAndVAO(gl, sBase);
 
-    /*
-    function generatePlane() {
-        return new Shape(
-            [
-                -8.0, -3.0, -8.0,
-                -8.0, -3.0, 8.0,
-                8.0, -3.0, -8.0,
-                8.0, -3.0, 8.0,
-            ],
-            [
-                0, 1, 2,
-                2, 3, 1
-            ],
-            [
-                0.5, 0.5, 0.5,
-                0.5, 0.5, 0.5,
-                0.5, 0.5, 0.5,
-                0.5, 0.5, 0.5
-            ],
-            glm.mat4.create(),
-            [
-                0.0, 1.0, 0.0,
-                0.0, 1.0, 0.0,
-                0.0, 1.0, 0.0,
-                0.0, 1.0, 0.0,
-            ]
-        );
-    }*/
 
     //NOTE: to emit typescript error about Offscreencanvas
     const cv = gl.canvas as HTMLCanvasElement;
     glm.mat4.ortho( //TODO: change to orthographic
         projectionMatrix, // Output
-        glm.vec3.fromValues(),//left
-        glm.vec3.fromValues(),//right
-        glm.vec3.fromValues(),//bottom
-        glm.vec3.fromValues(),//top
-        glm.vec3.fromValues(),//near
-        glm.vec3.fromValues(),//far
+        -9, //left
+        9, //right
+        -7, //bottom
+        7, //top
+        0.1, //near
+        100, //far
     );
-
     const draw = (_: any) => {
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
         gl.clearDepth(1.0); // Clear everything
@@ -97,7 +71,7 @@ const main = async () => {
         sBase.uniformMatrices(gl, projectionMatrix, camera.viewMatrix);
         //TODO: draw objects
         globalCoords.draw(gl, sBase);
-
+        grid.draw(gl, sBase);
 
         window.requestAnimationFrame(draw);
 
