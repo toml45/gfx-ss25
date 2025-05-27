@@ -66,7 +66,7 @@ export class Grid extends Entity {
                     const y2 = glm.vec3.str(glm.vec3.fromValues(x, y - 1, z));
                     const z1 = glm.vec3.str(glm.vec3.fromValues(x, y, z - 1));
                     const z2 = glm.vec3.str(glm.vec3.fromValues(x, y, z + 1));
-                    const v1 = this.vertexMap.get(curVertexStr);
+                    let v1 = this.vertexDebugMap.get(curVertexStr);
 
 
                     if (this.vertexDebugMap.has(x1)) {
@@ -95,6 +95,7 @@ export class Grid extends Entity {
                     }
 
                     if (!this.vertexMap.has(curVertexStr)) continue;
+                    v1 = this.vertexDebugMap.get(curVertexStr);
                     //for non-debug grid
                     if (this.vertexMap.has(x1)) {
                         const v2 = this.vertexMap.get(x1)

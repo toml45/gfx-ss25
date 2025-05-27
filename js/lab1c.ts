@@ -2,7 +2,8 @@ import { Camera } from "./camera.js";
 import * as glm from "./gl-matrix/index.js";
 import { Grid } from "./grid.js";
 import { Shader } from "./shader.js";
-import { CoordinateVisual } from "./shape.js";
+import { CoordinateVisual } from "./coordinateVisual.js";
+import { Cube } from "./cube.js";
 
 const main = async () => {
     const projectionMatrix = glm.mat4.create();
@@ -41,9 +42,11 @@ const main = async () => {
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-    const sBase = new Shader("basic"); //TODO: load shader
+    const sBase = new Shader("basic");
     await sBase.loadAndCompile(gl);
 
+    const testCube = new Cube(glm.vec3.fromValues(1, 0, 0));//TODO: remove
+    testCube.initializeBuffersAndVAO(gl, sBase);
     globalCoords.initializeBuffersAndVAO(gl, sBase);
     grid.initializeBuffersAndVAO(gl, sBase);
 
@@ -70,6 +73,7 @@ const main = async () => {
         sBase.bind(gl);
         sBase.uniformMatrices(gl, projectionMatrix, camera.viewMatrix);
         //TODO: draw objects
+        testCube.draw(gl, sBase);
         globalCoords.draw(gl, sBase);
         grid.draw(gl, sBase);
 
@@ -78,6 +82,5 @@ const main = async () => {
     }
     window.requestAnimationFrame(draw);
 }
-
 
 main();

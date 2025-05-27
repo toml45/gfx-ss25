@@ -3,7 +3,7 @@ import { Shape } from './shapes.js';
 
 export class OBJParser {
 
-    static parseOBJ(obj: string): Shape {
+    static parseOBJSmoothNormals(obj: string): Shape {
 
         let vertexMap: Map<number, vec3[]> = new Map();
 
