@@ -4,6 +4,8 @@ import { Grid } from "./grid.js";
 import { Shader } from "./shader.js";
 import { CoordinateVisual } from "./coordinateVisual.js";
 import { Cube } from "./cube.js";
+import { Tetracube, TetracubeType } from "./tetracube.js";
+import { zero } from "./gl-matrix/vec3.js";
 
 const main = async () => {
     const projectionMatrix = glm.mat4.create();
@@ -44,12 +46,15 @@ const main = async () => {
 
     const sBase = new Shader("basic");
     await sBase.loadAndCompile(gl);
+    const gd = new Shader("gouraud_diffuse");
+    await gd.loadAndCompile(gl);
 
-    const testCube = new Cube(glm.vec3.fromValues(1, 0, 0));//TODO: remove
-    testCube.initializeBuffersAndVAO(gl, sBase);
+    const testTetracube = new Tetracube(TetracubeType.TOWER_LEFT);
     globalCoords.initializeBuffersAndVAO(gl, sBase);
     grid.initializeBuffersAndVAO(gl, sBase);
+    testTetracube.initializeBuffersAndVAO(gl, gd);
 
+    const toLightVector: vec3 = glm.vec3.fromValues(1, 1, 1);
 
     //NOTE: to emit typescript error about Offscreencanvas
     const cv = gl.canvas as HTMLCanvasElement;
@@ -62,7 +67,14 @@ const main = async () => {
         0.1, //near
         100, //far
     );
+
+    let lastUpdate = Date.now(); //for deltatime calculation
+
     const draw = (_: any) => {
+        const now = Date.now();
+        const deltaTime = now - lastUpdate;
+        lastUpdate = now;
+
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
         gl.clearDepth(1.0); // Clear everything
         gl.enable(gl.DEPTH_TEST); // Enable depth testing
@@ -72,10 +84,16 @@ const main = async () => {
 
         sBase.bind(gl);
         sBase.uniformMatrices(gl, projectionMatrix, camera.viewMatrix);
-        //TODO: draw objects
-        testCube.draw(gl, sBase);
         globalCoords.draw(gl, sBase);
         grid.draw(gl, sBase);
+
+        gd.bind(gl);
+        gd.uniformMatrices(gl, projectionMatrix, camera.viewMatrix);
+        gl.uniform3fv(gd.u_locLightPos, toLightVector);
+        testTetracube.draw(gl, gd);
+        if (!testTetracube.checkGravityCollision())
+            testTetracube.moveDown(0.02);
+        console.log(testTetracube.cubes[0].getY());
 
         window.requestAnimationFrame(draw);
 

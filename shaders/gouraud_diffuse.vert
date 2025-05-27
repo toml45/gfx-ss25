@@ -21,21 +21,8 @@ void main() {
     
     vec3 ambient = a_color.rgb*vec3(0.2, 0.2, 0.2);
 
-    if (u_shadowMapTransform != mat4(1.0)) {
-        vec3 vertexPosLightNormalised = (vertexPosLight.xyz / vertexPosLight.w)*0.5 + 0.5;
-
-        float shadowMapDepth = texture2D(u_sampler, vertexPosLightNormalised.xy).r;
-
-        if (vertexPosLightNormalised.z > shadowMapDepth + 0.0007) {
-            v_vertexColor = vec4(ambient, 1.0);
-            gl_Position = u_projection * u_view  * u_modelView * vec4(a_coords, 1.0);
-            return;
-        }
-    }
-
-
     vertexNormal = normalize( vertexNormal );
-    vec3 vertexToLight = normalize(u_lightPos - vertexPos);
+    vec3 vertexToLight = normalize(u_lightPos);
 
     float diffuseAngle = dot(vertexNormal, vertexToLight);
     diffuseAngle = clamp(diffuseAngle, 0.0, 1.0);

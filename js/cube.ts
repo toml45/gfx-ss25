@@ -266,4 +266,21 @@ export class Cube extends Entity {
         //    this.coordSystem.draw(gl, shader);
     }
 
+    getX() {
+        const v = glm.mat4.create();
+        glm.mat4.getTranslation(v, this.positionTranslationMatrix);
+        return v[0];
+    }
+
+    getY() {
+        const v = glm.mat4.create();
+        glm.mat4.getTranslation(v, this.positionTranslationMatrix);
+        return v[1];
+    }
+
+    getZ() {
+        const v = glm.mat4.create();
+        glm.mat4.getTranslation(v, this.positionTranslationMatrix);
+        return v[2];
+    }
 }
