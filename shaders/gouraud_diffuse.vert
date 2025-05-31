@@ -15,7 +15,6 @@ uniform sampler2D u_sampler;
 varying vec4 v_vertexColor;
 
 void main() {
-    vec4 vertexPosLight = u_shadowMapTransform * u_modelView * vec4(a_coords, 1.0);
     vec3 vertexPos = vec3(u_view  * u_modelView * vec4(a_coords, 1.0));
     vec3 vertexNormal = mat3(u_view) * u_modelViewInverseTranspose * a_normal;
     

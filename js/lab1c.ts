@@ -5,7 +5,6 @@ import { Shader } from "./shader.js";
 import { CoordinateVisual } from "./coordinateVisual.js";
 import { Cube } from "./cube.js";
 import { Tetracube, TetracubeType } from "./tetracube.js";
-import { zero } from "./gl-matrix/vec3.js";
 
 const main = async () => {
     const projectionMatrix = glm.mat4.create();
@@ -49,10 +48,9 @@ const main = async () => {
     const gd = new Shader("gouraud_diffuse");
     await gd.loadAndCompile(gl);
 
-    const testTetracube = new Tetracube(TetracubeType.TOWER_LEFT);
+    const allCubes: Cube[] = [];
     globalCoords.initializeBuffersAndVAO(gl, sBase);
     grid.initializeBuffersAndVAO(gl, sBase);
-    testTetracube.initializeBuffersAndVAO(gl, gd);
 
     const toLightVector: vec3 = glm.vec3.fromValues(1, 1, 1);
 
@@ -68,9 +66,18 @@ const main = async () => {
         100, //far
     );
 
+    //-------------------Game varaibles--------------
+    let activeTetrPresent = false;
     let lastUpdate = Date.now(); //for deltatime calculation
+    let activeTetracube: Tetracube = null;
 
     const draw = (_: any) => {
+
+        if (!activeTetrPresent) {
+            activeTetracube = Tetracube.spawn(gl, gd);
+            activeTetrPresent = true;
+        }
+
         const now = Date.now();
         const deltaTime = now - lastUpdate;
         lastUpdate = now;
@@ -90,10 +97,18 @@ const main = async () => {
         gd.bind(gl);
         gd.uniformMatrices(gl, projectionMatrix, camera.viewMatrix);
         gl.uniform3fv(gd.u_locLightPos, toLightVector);
-        testTetracube.draw(gl, gd);
-        if (!testTetracube.checkGravityCollision())
-            testTetracube.moveDown(0.02);
-        console.log(testTetracube.cubes[0].getY());
+        activeTetracube.draw(gl, gd);
+        for (const cube of allCubes)
+            cube.draw(gl, gd);
+
+        if (!activeTetracube.checkGravityCollision() && !activeTetracube.checkCubeGravityCollision(allCubes)) {
+            activeTetracube.moveDown(0.04);
+        } else {
+            activeTetrPresent = false;
+            allCubes.push(...activeTetracube.toCubes());
+        }
+        console.log(allCubes);
+        //console.log(testTetracube.cubes[0].getY());
 
         window.requestAnimationFrame(draw);
 
