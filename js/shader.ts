@@ -43,6 +43,9 @@ export class Shader {
     u_locProjectionTransform: WebGLUniformLocation = null;
     u_locViewTransform: WebGLUniformLocation = null;
     u_globalTransform: WebGLUniformLocation = null;
+    u_locDiffuseComponent: WebGLUniformLocation = null;
+    u_locAmbientComponent: WebGLUniformLocation = null;
+    u_locSpecularComponent: WebGLUniformLocation = null;
 
     constructor(name: string) {
         this.name = name;
@@ -111,6 +114,18 @@ export class Shader {
             "u_lightPos"
         )
 
+        this.u_locAmbientComponent = gl.getUniformLocation(
+            this.program,
+            "u_ambientComponent"
+        )
+        this.u_locDiffuseComponent = gl.getUniformLocation(
+            this.program,
+            "u_diffuseComponent"
+        )
+        this.u_locSpecularComponent = gl.getUniformLocation(
+            this.program,
+            "u_specularComponent"
+        )
 
     }
 

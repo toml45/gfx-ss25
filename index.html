@@ -18,7 +18,32 @@
 
 <body>
     <h1>GFX - Lab1c</h1>
-    <canvas id="glcanvas" width="640" height="480"></canvas>
+    <hr />
+    <div style="width: fit-content; margin: 0 auto; text-align: center;">
+        <h2>options</h2>
+        <label>
+            ambient
+            <input type="range" id="ambientSlider" min="0" max="1" step="0.01" value="0.2" />
+        </label>
+        <label>
+            diffuse
+            <input type="range" id="diffuseSlider" min="0" max="1" step="0.01" value="0.7" />
+        </label>
+        <label>
+            specular
+            <input type="range" id="specularSlider" min="0" max="1" step="0.01" value="0.8" />
+        </label>
+    </div>
+    <div>
+        <canvas id="glcanvas" width="768" height="576"></canvas>
+        <div id="gameOver" style="width: fit-content; 
+                                    margin: 0 auto; 
+                                    text-align: center; 
+                                    display: none">
+            <h1>you lost</h1>
+            <button id="restartButton">restart</button>
+        </div>
+    </div>
 </body>
 
 </html>

@@ -169,7 +169,7 @@ export class InputHandler {
         switch (event.key) {
 
             case "ArrowUp":
-                this.cameraDelta[1] += 10;
+                this.cameraDelta[1] += 10
                 break;
 
             case "ArrowDown":

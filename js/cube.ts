@@ -110,6 +110,7 @@ export class Cube extends Entity {
     boundingBoxTransform: mat4;
     //coordSystem: CoordinateVisual;
     globalTranslationMatrix: mat4;
+    modelViewMatrix: mat4;
 
     constructor(
         color: vec3,
@@ -126,6 +127,7 @@ export class Cube extends Entity {
         this.normalData = Cube.cubeNormalData;
         this.indices = [];
         this.colors = [];
+        this.modelViewMatrix = glm.mat4.create();
 
         for (let i = 0; i < this.vertexData.length; i++) {
             this.indices.push(i);
@@ -176,6 +178,7 @@ export class Cube extends Entity {
             modelMatrix
         );
 
+        glm.mat4.copy(this.modelViewMatrix, modelMatrix);
         gl.uniformMatrix4fv(
             shader.u_locModelViewTansform,
             false,
@@ -266,21 +269,112 @@ export class Cube extends Entity {
         //    this.coordSystem.draw(gl, shader);
     }
 
+    getModelViewWithCustomGlobalTransform(globTr: mat4) { // atrocious naming
+        const modelMatrix = glm.mat4.create();
+        glm.mat4.multiply(
+            modelMatrix,
+            this.rotationMatrix,
+            modelMatrix
+        );
+
+        glm.mat4.multiply(
+            modelMatrix,
+            this.boundingBoxTransform,
+            modelMatrix
+        ); // Bounding box centering/scaling
+
+        glm.mat4.multiply(
+            modelMatrix,
+            this.scalingMatrix,
+            modelMatrix
+        ); // Scales the object
+
+        glm.mat4.multiply(
+            modelMatrix,
+            this.positionTranslationMatrix,
+            modelMatrix
+        ); // Puts the object in the right position
+
+        glm.mat4.multiply(
+            modelMatrix,
+            globTr,
+            modelMatrix
+        );
+
+        glm.mat4.multiply(
+            modelMatrix,
+            this.globalTranslationMatrix,
+            modelMatrix
+        );
+        return modelMatrix;
+    }
+
+    getFullPos() {
+        const v = glm.vec3.create();
+        glm.mat4.getTranslation(v, this.modelViewMatrix);
+        return v;
+    }
+
     getX() {
-        const v = glm.mat4.create();
-        glm.mat4.getTranslation(v, this.positionTranslationMatrix);
+        const v = glm.vec3.create();
+        glm.mat4.getTranslation(v, this.modelViewMatrix);
         return v[0];
     }
 
     getY() {
-        const v = glm.mat4.create();
-        glm.mat4.getTranslation(v, this.positionTranslationMatrix);
+        const v = glm.vec3.create();
+        glm.mat4.getTranslation(v, this.modelViewMatrix);
         return v[1];
     }
 
     getZ() {
-        const v = glm.mat4.create();
-        glm.mat4.getTranslation(v, this.positionTranslationMatrix);
+        const v = glm.vec3.create();
+        glm.mat4.getTranslation(v, this.modelViewMatrix);
         return v[2];
     }
+
+    globalTranslate(translationVector: vec3) {
+        glm.mat4.translate(
+            this.globalTranslationMatrix,
+            this.globalTranslationMatrix,
+            translationVector
+        )
+    }
+
+    snapToBottom(cubes: Cube[]) {
+        //incredibly inefficient
+        let closestTetracube: Cube = null;
+        let closestCube: Cube = null;
+        let minDistance = 10e9;
+
+        for (const c2 of cubes) {
+            if (Math.abs(this.getX() - c2.getX()) < 1)
+                if (Math.abs(this.getZ() - c2.getZ()) < 1) {
+                    const dy = Math.abs(this.getY() - c2.getY())
+                    if (dy < minDistance) {
+                        closestTetracube = this;
+                        closestCube = c2;
+                        minDistance = dy;
+                    }
+                }
+        }
+
+        if (closestTetracube === null) {
+            let lowestCube = 10e9;
+            if (this.getY() < lowestCube)
+                lowestCube = this.getY();
+            const t = Math.abs(lowestCube + 4.5);
+            console.log(`cube to floor: ${t}`);
+            this.globalTranslate([0, t, 0]);
+            return;
+        }
+
+        console.log(`cube Y ${closestCube.getY()}`)
+        const t = Math.abs(closestCube.getY() - closestTetracube.getY()) - 1;
+        console.log(`cube to othercube: ${t}`);
+
+        this.globalTranslate([0, t, 0]);
+
+    }
+
 }

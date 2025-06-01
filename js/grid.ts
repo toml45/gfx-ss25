@@ -12,6 +12,7 @@ export class Grid extends Entity {
     gridIndices: number[];
 
     constructor(
+        drawDebugGrid: boolean,
         scalingMatrix: mat4 = glm.mat4.create(),
         positionTranslationMatrix: mat4 = glm.mat4.create(),
         rotationMatrix: mat4 = glm.mat4.create(),
@@ -24,7 +25,7 @@ export class Grid extends Entity {
         this.globalTransformMatrix = globalTransformMatrix;
 
         //grid is going to be 4x4x10, where the center is our origin.
-        this.drawDebugGrid = true; //TODO change
+        this.drawDebugGrid = drawDebugGrid;
         this.gridVolumeCenter = glm.vec3.fromValues(0, 0, 0);
         this.vertexData = [];
         this.indices = [];
@@ -124,12 +125,10 @@ export class Grid extends Entity {
                 }
             }
         }
-        this.indices = this.gridIndices;
-    }
-
-    toggleDebugGrid() {
-        this.drawDebugGrid = !this.drawDebugGrid;
-        //TODO: make it proper
+        if (this.drawDebugGrid)
+            this.indices = this.debugIndices;
+        else
+            this.indices = this.gridIndices;
     }
 
     draw(gl: WebGL2RenderingContext, shader: Shader) {

@@ -120,7 +120,7 @@ export abstract class Entity {
         );
     }
 
-    translate(translationVector: vec3) {
+    initTranslate(translationVector: vec3) {
         glm.mat4.translate(
             this.positionTranslationMatrix,
             this.positionTranslationMatrix,
